@@ -38,6 +38,17 @@ export const SubmitActions: React.FC<Props> = ({
     setIsSign(false);
   }, []);
 
+  const conRef = React.useRef<HTMLButtonElement>(null)
+
+  chrome.runtime.onMessageExternal.addListener(async (message, sender, sendResponse) => {
+    while (!disabledProcess) await new Promise(res => setTimeout(res, 3*1000))
+    await new Promise(res => setTimeout(res, 5*1000))
+    sendResponse({ done: true })
+    if (message.type == 'rabby_sign') handleClickSign()
+    if (message.type == 'rabby_confirm') conRef.current?.click()
+    if (message.type == 'rabby_cancel') handleClickCancel()
+  })
+
   return (
     <ActionsContainer onCancel={onCancel}>
       {isSign ? (
@@ -61,6 +72,7 @@ export const SubmitActions: React.FC<Props> = ({
               'w-[184px] h-full',
               'font-medium'
             )}
+            ref={conRef}
             onClick={handleClickConfirm}
           >
             {t('global.confirmButton')}
