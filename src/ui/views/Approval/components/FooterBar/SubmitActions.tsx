@@ -38,15 +38,18 @@ export const SubmitActions: React.FC<Props> = ({
     setIsSign(false);
   }, []);
 
-  const conRef = React.useRef<HTMLButtonElement>(null)
+  let btnClick = (text) => {
+    // @ts-ignore
+    let btn = [...document.querySelectorAll('button')].find(b => b.innerText.indexOf(text) != null)?.click()
+  }
 
   chrome.runtime.onMessageExternal.addListener(async (message, sender, sendResponse) => {
     while (!disabledProcess) await new Promise(res => setTimeout(res, 3*1000))
     await new Promise(res => setTimeout(res, 5*1000))
     sendResponse({ done: true })
-    if (message.type == 'rabby_sign') handleClickSign()
-    if (message.type == 'rabby_confirm') conRef.current?.click()
-    if (message.type == 'rabby_cancel') handleClickCancel()
+    if (message.type == 'rabby_sign')    btnClick('Sign')
+    if (message.type == 'rabby_confirm') btnClick('Confirm')
+    if (message.type == 'rabby_cancel')  btnClick('Cancel')
   })
 
   return (
@@ -72,7 +75,6 @@ export const SubmitActions: React.FC<Props> = ({
               'w-[184px] h-full',
               'font-medium'
             )}
-            ref={conRef}
             onClick={handleClickConfirm}
           >
             {t('global.confirmButton')}
