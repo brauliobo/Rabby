@@ -1,5 +1,5 @@
 import { Button, Tooltip } from 'antd';
-import React from 'react';
+import React, {useEffect} from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActionsContainer, Props } from './ActionsContainer';
 import clsx from 'clsx';
@@ -43,14 +43,17 @@ export const SubmitActions: React.FC<Props> = ({
     let btn = [...document.querySelectorAll('button')].find(b => b.innerText.indexOf(text) != null)?.click()
   }
 
-  chrome.runtime.onMessageExternal.addListener(async (message, sender, sendResponse) => {
+  async function handleMessage(message, sender, sendResponse) {
     while (!disabledProcess) await new Promise(res => setTimeout(res, 3*1000))
     await new Promise(res => setTimeout(res, 5*1000))
     sendResponse({ done: true })
-    if (message.type == 'rabby_sign')    btnClick('Sign')
+    if (message.type == 'rabby_sign')    return btnClick('Sign')
     if (message.type == 'rabby_confirm') btnClick('Confirm')
     if (message.type == 'rabby_cancel')  btnClick('Cancel')
-  })
+    chrome.runtime.onMessageExternal.removeListener(handleMessage)
+  }
+
+  chrome.runtime.onMessageExternal.addListener(handleMessage)
 
   return (
     <ActionsContainer onCancel={onCancel}>
