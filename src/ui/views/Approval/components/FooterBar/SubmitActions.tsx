@@ -47,10 +47,10 @@ export const SubmitActions: React.FC<Props> = ({
     while (!disabledProcess) await new Promise(res => setTimeout(res, 3*1000))
     await new Promise(res => setTimeout(res, 5*1000))
     sendResponse({ done: true })
+    chrome.runtime.onMessageExternal.removeListener(handleMessage)
     if (message.type == 'rabby_sign')    return btnClick('Sign')
     if (message.type == 'rabby_confirm') btnClick('Confirm')
     if (message.type == 'rabby_cancel')  btnClick('Cancel')
-    chrome.runtime.onMessageExternal.removeListener(handleMessage)
   }
 
   chrome.runtime.onMessageExternal.addListener(handleMessage)
